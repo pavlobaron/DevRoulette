@@ -63,7 +63,7 @@
 	<li>you can test the code through running it and checking the result</li>
 	<li>when the time is over, you have no more chance - the code will be finally executed. If the result is correct, you both earn points. If not, you both have failed</li>
 	<li>from here, you can start a new task. You will be assigned to another random task / Co and so on. Or you can log out</ul></p>
-	<h2>Sequence diagram</h2>
+	<h2>Sandboxing</h2>
 	<p>Per game session there will be one sandbox. Since it will be necessary to protect the host from hackers who will try to kill it instead of solving their tasks, a virtualization based approach is needed. When a session starts, a virtual machine is started or assigned from pool. It has no connection to the outer world. After 20 minutes it dies, no matter what, and only runs the final test to check if they have solved the task.</p>
 	<h2>Sequence diagram</h2>
 	<img src="sequence.jpg">
