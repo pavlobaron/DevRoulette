@@ -8,8 +8,7 @@ APP_NAME=devroulette
 
 all: ebin compile
 boot: all make_boot
-start: boot
- start_all
+start: boot start_all
 
 compile:
 	@$(CC) -noinput +B -eval 'case make:all() of up_to_date -> halt(0); error -> halt(1) end.'
