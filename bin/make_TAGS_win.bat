@@ -1,0 +1,1 @@
+bash.exe -c "/bin/find . -name *.[he]rl -type f -print | etags -"
