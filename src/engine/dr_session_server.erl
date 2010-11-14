@@ -14,11 +14,7 @@
 -export([handle_info/2]).
 -export([terminate/2]).
 
--record(state, {
-	  start,
-	  player1,
-	  player2
-        }).
+-include("dr_all.hrl").
 
 start_link(Args) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [Args], []).
