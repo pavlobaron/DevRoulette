@@ -6,7 +6,7 @@
 -module(dr_session_server).
 -behaviour(gen_server).
 
--export([start_link/1]).
+-export([start_link/2]).
 -export([init/1]).
 -export([code_change/3]).
 -export([handle_call/3]).
@@ -16,13 +16,16 @@
 
 -include("dr_all.hrl").
 
-start_link(Args) ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [Args], []).
+start_link(Id, SessionId) ->
+    gen_server:start_link({local, Id}, ?MODULE, [Id, SessionId], []).
 
-init(_Args) ->
-    error_logger:info_report("server started"),
-    process_flag(trap_exit, true),
-    {ok, #state{}}.
+init(Args) ->
+    error_logger:info_report("session server started with Args: "),
+    error_logger:info_report(Args),
+    [Id|T] = Args,
+    [SessionId|_T] = T,
+    State = #state{id = Id, session_id = SessionId},
+    {ok, State}.
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
@@ -31,8 +34,9 @@ handle_call(_Request, _From, State) ->
   Reply = ok,
   {reply, Reply, State}.
 
-handle_cast(_Msg, State) ->
-  {noreply, State}.
+handle_cast(stop, State) ->
+    dr_session:stop(State#state.session_id),
+    {noreply, State}.
 
 handle_info(_Info, State) ->
   {noreply, State}.

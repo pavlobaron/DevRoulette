@@ -19,12 +19,11 @@
     nada
         }).
 
-start_link(Args) ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [Args], []).
+start_link(Id) ->
+    gen_server:start_link({local, Id}, ?MODULE, Id, []).
 
 init(_Args) ->
     error_logger:info_report("vm server started"),
-    process_flag(trap_exit, true),
     {ok, #state{}}.
 
 code_change(_OldVsn, State, _Extra) ->

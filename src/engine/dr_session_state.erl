@@ -9,8 +9,8 @@
 -export([start_link/1]).
 -export([init/1]).
 
-start_link(Args) ->
-    gen_fsm:start_link({local, ?MODULE}, ?MODULE, Args, []).
+start_link(Id) ->
+    gen_fsm:start_link({local, Id}, ?MODULE, Id, []).
 
 init(_Args) ->
     error_logger:info_report("state started"),
