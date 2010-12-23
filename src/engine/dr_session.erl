@@ -35,4 +35,4 @@ init(Args) ->
 stop(Id) ->
     error_logger:info_report("trying to terminate process: "),
     error_logger:info_report(Id),
-    exit(whereis(Id), normal).
+    dr_supervisor:end_session(Id).

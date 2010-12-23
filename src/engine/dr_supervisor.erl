@@ -7,7 +7,7 @@
 
 -export([start_link/1]).
 -export([init/1]).
--export([start_session/0]).
+-export([start_session/0, end_session/1]).
 
 start_link(Args) ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, Args).
@@ -35,3 +35,6 @@ start_session() ->
 	{ok, _, _} -> {ok, Id};
 	{error, _} -> {error, Id}
     end.
+
+end_session(Id) ->
+    supervisor:terminate_child(?MODULE, Id).
