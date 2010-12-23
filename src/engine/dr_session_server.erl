@@ -17,13 +17,12 @@
 -include("dr_all.hrl").
 
 start_link(Id, SessionId) ->
-    gen_server:start_link({local, Id}, ?MODULE, [Id, SessionId], []).
+    gen_server:start_link({local, Id}, ?MODULE, {Id, SessionId}, []).
 
 init(Args) ->
     error_logger:info_report("session server started with Args: "),
     error_logger:info_report(Args),
-    [Id|T] = Args,
-    [SessionId|_T] = T,
+    {Id, SessionId} = Args,
     State = #state{id = Id, session_id = SessionId},
     {ok, State}.
 
