@@ -23,7 +23,7 @@ init(Args) ->
     error_logger:info_report("session server started with Args: "),
     error_logger:info_report(Args),
     {Id, SessionId} = Args,
-    State = #state{id = Id, session_id = SessionId},
+    State = #session_server_state{id = Id, session_id = SessionId},
     {ok, State}.
 
 code_change(_OldVsn, State, _Extra) ->
@@ -34,7 +34,10 @@ handle_call(_Request, _From, State) ->
   {reply, Reply, State}.
 
 handle_cast(stop, State) ->
-    dr_session:stop(State#state.session_id),
+    dr_session:stop(State#session_server_state.session_id),
+    {noreply, State};
+handle_cast({kill_client, ClientId}, State) ->
+    dr_session:kill_client(State#session_server_state.session_id, ClientId),
     {noreply, State}.
 
 handle_info(_Info, State) ->

@@ -8,21 +8,17 @@
 -behaviour(supervisor).
 
 -export([start_link/1]).
--export([init/1, stop/1]).
+-export([init/1, stop/1, start_client/3, kill_client/2]).
 
 start_link(Id) ->
     supervisor:start_link({local, Id}, ?MODULE, Id).
 
-make_child_id(Id, Atom) ->
-    list_to_atom(atom_to_list(Id) ++ "_" ++ atom_to_list(Atom)).
-
 init(Args) ->
     error_logger:info_report("session started with Args"),
     error_logger:info_report(Args),
-    Server = make_child_id(Args, server),
-    error_logger:info_report(Server),
-    State = make_child_id(Args, state),
-    Vm = make_child_id(Args, vm),
+    Server = dr_supervisor_lib:make_child_id(Args, server),
+    State = dr_supervisor_lib:make_child_id(Args, state),
+    Vm = dr_supervisor_lib:make_child_id(Args, vm),
     {ok, {{one_for_one, 2, 10}, [
 	  {Server,
 	   {dr_session_server, start_link, [Server, Args]}, transient, 2000, worker, [dr_session_server]},
@@ -33,6 +29,31 @@ init(Args) ->
     ]}}.
 
 stop(Id) ->
-    error_logger:info_report("trying to terminate process: "),
-    error_logger:info_report(Id),
     dr_supervisor:end_session(Id).
+
+%% FIXME: for the first draft, the clients will be started
+%% on the local machine. In the real world implementation,
+%% clients have to be started on remote client nodes
+start_client(Id, M, F) ->
+    [_S, _A, _Sup, {workers, Workers}] = supervisor:count_children(Id),
+    case Workers < 5 of
+	true ->
+	    ChildAtom = dr_supervisor_lib:make_child_id(Id, client),
+	    ChildId = list_to_atom(atom_to_list(ChildAtom) ++ "_" ++ integer_to_list(Workers - 2)),
+	    dr_supervisor_lib:start_dynamic_child(Id, M, F,
+						  [ChildId,
+						   dr_supervisor_lib:make_child_id(Id, server)],
+						  transient, 2000, worker, ChildId);
+    	false ->
+	    error_logger:info_report("only two clients are allowed per session"),
+	    error
+    end.
+
+kill_client(Id, ChildId) ->
+    dr_supervisor_lib:kill_dynamic_child(Id, ChildId),
+    [_S, _A, _Sup, {workers, Workers}] = supervisor:count_children(Id),
+    case Workers < 4 of
+	true ->
+	    stop(Id);
+	_ -> ok
+    end.

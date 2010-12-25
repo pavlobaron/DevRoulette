@@ -7,7 +7,8 @@
 
 -export([start_link/1]).
 -export([init/1]).
--export([start_session/0, end_session/1]).
+
+-export([start_client/0, end_session/1]).
 
 start_link(Args) ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, Args).
@@ -21,20 +22,33 @@ get_new_session_id() ->
     Hash = erlang:phash2(make_ref()),
     Id = list_to_atom("session_" ++ integer_to_list(Hash)).
 
-child_spec_from_session_id(Id) ->
-    {Id, {dr_session, start_link, [Id]}, transient, 2000, supervisor, [dr_session]}.
-
 start_session() ->
-    Id = get_new_session_id(),
-    Spec = child_spec_from_session_id(Id),
-    Result = supervisor:start_child(?MODULE, Spec),
-    error_logger:info_report("supervisor:start_child for session returned: "),
-    error_logger:info_report(Result),
-    case Result of
-	{ok, _} -> {ok, Id};
-	{ok, _, _} -> {ok, Id};
-	{error, _} -> {error, Id}
-    end.
+    ChildId = get_new_session_id(),
+    dr_supervisor_lib:start_dynamic_child(?MODULE, dr_session, start_link,
+					  [ChildId], transient, 2000, supervisor, ChildId).
 
 end_session(Id) ->
-    supervisor:terminate_child(?MODULE, Id).
+    dr_supervisor_lib:kill_dynamic_child(?MODULE, Id).
+
+start_client() ->
+    L = supervisor:which_children(?MODULE),
+    start_client_internal(L).
+
+%%FIXME: here is wx hard-coded -> redesign to configuration
+start_client_internal([]) ->
+    start_session(),
+    start_client();
+start_client_internal([H|T]) ->
+    {Id, _P, Type, _M} = H,
+    case Type of
+	supervisor ->
+	    Result = dr_session:start_client(Id, dr_wx_client, start_link),
+	    error_logger:info_report("start_client returned: "),
+	    error_logger:info_report(Result),
+	    case Result of
+		error ->
+		    start_client_internal(T);
+		_ -> ok
+	    end;
+	_ ->  start_client_internal(T)
+    end.

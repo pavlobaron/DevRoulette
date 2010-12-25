@@ -17,9 +17,7 @@
 -export([handle_info/2]).
 -export([terminate/2]).
 
--record(state, {
-    nada
-        }).
+-include("dr_all.hrl").
 
 start_link(Args) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, Args, []).
@@ -28,17 +26,14 @@ init(Args) ->
     error_logger:info_report("main server started with Args = "),
     error_logger:info_report(Args),
     process_flag(trap_exit, true),
-    {ok, #state{}}.
+    {ok, #server_state{}}.
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
-handle_call(new_session, _From, State) ->
-    Result = dr_supervisor:start_session(),
-    case Result of
-	{ok, Id} -> {reply, Id, State};
-	{error, _} -> {reply, error, State}
-    end.
+handle_call(new_client, _From, State) ->
+    Result = dr_supervisor:start_client(),
+    {reply, Result, State}.
 
 handle_cast(_Msg, State) ->
     {noreply, State}.

@@ -1,0 +1,12 @@
+How to test (frequently changing):
+
+OS:
+make boot
+
+erl:
+code:add_path(".....DevRoulette/ebin").
+application:start(devroulette).
+gen_server:call(dr_server, new_client).
+
+wx-client:
+menu File/Exit

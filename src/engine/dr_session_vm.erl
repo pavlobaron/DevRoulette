@@ -15,16 +15,14 @@
 -export([handle_info/2]).
 -export([terminate/2]).
 
--record(state, {
-    nada
-        }).
+-include("dr_all.hrl").
 
 start_link(Id) ->
     gen_server:start_link({local, Id}, ?MODULE, Id, []).
 
 init(_Args) ->
     error_logger:info_report("vm server started"),
-    {ok, #state{}}.
+    {ok, #session_vm_state{}}.
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
