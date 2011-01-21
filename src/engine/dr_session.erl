@@ -39,7 +39,7 @@ start_client(Id, M, F) ->
     case Workers < 5 of
 	true ->
 	    ChildAtom = dr_supervisor_lib:make_child_id(Id, client),
-	    ChildId = list_to_atom(atom_to_list(ChildAtom) ++ "_" ++ integer_to_list(Workers - 2)),
+	    ChildId = list_to_atom(string:concat(string:concat(atom_to_list(ChildAtom), "_"), integer_to_list(Workers - 2))),
 	    dr_supervisor_lib:start_dynamic_child(Id, M, F,
 						  [ChildId,
 						   dr_supervisor_lib:make_child_id(Id, server)],

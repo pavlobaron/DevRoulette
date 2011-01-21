@@ -20,7 +20,7 @@ init(_Args) ->
 
 get_new_session_id() ->
     Hash = erlang:phash2(make_ref()),
-    Id = list_to_atom("session_" ++ integer_to_list(Hash)).
+    Id = list_to_atom(string:concat("session_", integer_to_list(Hash))).
 
 start_session() ->
     ChildId = get_new_session_id(),
