@@ -10,7 +10,7 @@ new_child_spec(Id, M, F, A, Restart, Time, Type) ->
     {Id, {M, F, A}, Restart, Time, Type, [M]}.
 
 make_child_id(Id, Atom) ->
-    list_to_atom(atom_to_list(Id) ++ "_" ++ atom_to_list(Atom)).
+    list_to_atom(string:concat(string:concat(atom_to_list(Id), "_"), atom_to_list(Atom))).
 
 start_dynamic_child(Id, M, F, A, Restart, Time, Type, ChildId) ->
     Spec = new_child_spec(ChildId, M, F, A, Restart, Time, Type),
