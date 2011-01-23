@@ -5,15 +5,17 @@
 -module(dr_supervisor).
 -behaviour(supervisor).
 
--export([start_link/1]).
+-export([start_link/0]).
 -export([init/1]).
 
 -export([start_client/0, end_session/1]).
 
-start_link(Args) ->
-    supervisor:start_link({local, ?MODULE}, ?MODULE, Args).
+start_link() ->
+    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init(_Args) ->
+    %%FIXME: bring up vm manager
+
     ServerSpec = {server,
 		  {dr_server, start_link, [dr_server]}, transient, 2000, worker, [dr_server]},
     {ok, {{one_for_one, 2, 10}, [ServerSpec]}}.
@@ -42,7 +44,7 @@ start_client_internal([H|T]) ->
     {Id, _P, Type, _M} = H,
     case Type of
 	supervisor ->
-	    Result = dr_session:start_client(Id, dr_wx_client, start_link),
+	    Result = dr_session:start_client(Id),
 	    error_logger:info_report("start_client returned: "),
 	    error_logger:info_report(Result),
 	    case Result of

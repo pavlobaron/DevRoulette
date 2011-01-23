@@ -26,6 +26,8 @@ start_link(Id, Server) ->
     end.
 
 init(Pid, Id, Server) ->
+    %%REDISIGN: here, the code for the client must be pushed over to the client machine and
+    %%run there
     proc_lib:init_ack(Pid, {ok, self()}),
 
     wx:new(),

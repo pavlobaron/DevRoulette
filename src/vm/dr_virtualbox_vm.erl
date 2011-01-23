@@ -4,3 +4,7 @@
 
 -module(dr_virtualbox_vm).
 -behavior(dr_gen_vm).
+
+%%FIXME: implement :D
+init(Args) ->
+    1 = 1.

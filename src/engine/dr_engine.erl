@@ -8,8 +8,7 @@
 -export([start/2, stop/1]).
 
 start(_Type, _Args) ->
-    Args = lists:map(fun (Var) -> {ok, Value} = application:get_env(?MODULE, Var), Value end, []),
-    dr_supervisor:start_link(Args).
+    dr_supervisor:start_link().
 
 stop(_State) ->
     ok.

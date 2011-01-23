@@ -8,7 +8,7 @@
 -behaviour(supervisor).
 
 -export([start_link/1]).
--export([init/1, stop/1, start_client/3, kill_client/2]).
+-export([init/1, stop/1, start_client/1, kill_client/2]).
 
 start_link(Id) ->
     supervisor:start_link({local, Id}, ?MODULE, Id).
@@ -34,13 +34,17 @@ stop(Id) ->
 %% FIXME: for the first draft, the clients will be started
 %% on the local machine. In the real world implementation,
 %% clients have to be started on remote client nodes
-start_client(Id, M, F) ->
+start_client(Id) ->
     [_S, _A, _Sup, {workers, Workers}] = supervisor:count_children(Id),
     case Workers < 5 of
 	true ->
 	    ChildAtom = dr_supervisor_lib:make_child_id(Id, client),
-	    ChildId = list_to_atom(string:concat(string:concat(atom_to_list(ChildAtom), "_"), integer_to_list(Workers - 2))),
-	    dr_supervisor_lib:start_dynamic_child(Id, M, F,
+	    ChildId = list_to_atom(string:concat(
+				     string:concat(atom_to_list(ChildAtom), "_"),
+				     integer_to_list(Workers - 2))),
+	    dr_supervisor_lib:start_dynamic_child(Id,
+						  list_to_atom(dr_env_lib:get_env(dr_session, client)),
+						  start_link,
 						  [ChildId,
 						   dr_supervisor_lib:make_child_id(Id, server)],
 						  transient, 2000, worker, ChildId);
