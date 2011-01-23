@@ -16,5 +16,4 @@ get_env(Area) ->
 get_env(Area, Key) ->
 
 error_logger:info_report(get_env(Area)),
-
     [H | _T] = [X || {T, X} <- get_env(Area), T == Key], H.
