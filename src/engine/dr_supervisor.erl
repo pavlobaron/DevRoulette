@@ -26,17 +26,16 @@ get_new_session_id() ->
 
 start_session() ->
     ChildId = get_new_session_id(),
-    dr_supervisor_lib:start_dynamic_child(?MODULE, dr_session, start_link,
+    supervisor_lib:start_dynamic_child(?MODULE, dr_session, start_link,
 					  [ChildId], transient, 2000, supervisor, ChildId).
 
 end_session(Id) ->
-    dr_supervisor_lib:kill_dynamic_child(?MODULE, Id).
+    supervisor_lib:kill_dynamic_child(?MODULE, Id).
 
 start_client() ->
     L = supervisor:which_children(?MODULE),
     start_client_internal(L).
 
-%%FIXME: here is wx hard-coded -> redesign to configuration
 start_client_internal([]) ->
     start_session(),
     start_client();

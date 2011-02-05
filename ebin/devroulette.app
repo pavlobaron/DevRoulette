@@ -16,6 +16,7 @@
 		       {prog, "c:/program files/oracle/virtualbox/vboxmanage.exe"},
 		       {template, "dr_vb_template"},
 		       {params_start, "startvm --type headless"},
-		       {params_clone, "clonehd"}
+		       {params_clone, "clonehd"},
+		       {params_list, "list vms"}
 		       ]}
   ]}]}.

@@ -16,9 +16,9 @@ start_link(Id) ->
 init(Args) ->
     error_logger:info_report("session started with Args"),
     error_logger:info_report(Args),
-    Server = dr_supervisor_lib:make_child_id(Args, server),
-    State = dr_supervisor_lib:make_child_id(Args, state),
-    Vm = dr_supervisor_lib:make_child_id(Args, vm),
+    Server = supervisor_lib:make_child_id(Args, server),
+    State = supervisor_lib:make_child_id(Args, state),
+    Vm = supervisor_lib:make_child_id(Args, vm),
     {ok, {{one_for_one, 2, 10}, [
 	  {Server,
 	   {dr_session_server, start_link, [Server, Args]}, transient, 2000, worker, [dr_session_server]},
@@ -38,15 +38,15 @@ start_client(Id) ->
     [_S, _A, _Sup, {workers, Workers}] = supervisor:count_children(Id),
     case Workers < 5 of
 	true ->
-	    ChildAtom = dr_supervisor_lib:make_child_id(Id, client),
+	    ChildAtom = supervisor_lib:make_child_id(Id, client),
 	    ChildId = list_to_atom(string:concat(
 				     string:concat(atom_to_list(ChildAtom), "_"),
 				     integer_to_list(Workers - 2))),
-	    dr_supervisor_lib:start_dynamic_child(Id,
-						  list_to_atom(dr_env_lib:get_env(dr_session, client)),
+	    supervisor_lib:start_dynamic_child(Id,
+						  list_to_atom(env_lib:get_env(dr_session, client)),
 						  start_link,
 						  [ChildId,
-						   dr_supervisor_lib:make_child_id(Id, server)],
+						   supervisor_lib:make_child_id(Id, server)],
 						  transient, 2000, worker, ChildId);
     	false ->
 	    error_logger:info_report("only two clients are allowed per session"),
@@ -54,7 +54,7 @@ start_client(Id) ->
     end.
 
 kill_client(Id, ChildId) ->
-    dr_supervisor_lib:kill_dynamic_child(Id, ChildId),
+    supervisor_lib:kill_dynamic_child(Id, ChildId),
     [_S, _A, _Sup, {workers, Workers}] = supervisor:count_children(Id),
     case Workers < 4 of
 	true ->
