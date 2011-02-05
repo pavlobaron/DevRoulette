@@ -1,8 +1,7 @@
 %% @author Pavlo Baron <pb@pbit.org>
-%% @doc This is the supervisor lib of DevRoulette.
 %% @copyright 2010 Pavlo Baron
 
--module(dr_supervisor_lib).
+-module(supervisor_lib).
 
 -export([start_dynamic_child/8, make_child_id/2, kill_dynamic_child/2]).
 
