@@ -16,3 +16,4 @@ TODO:
 
 - check OpenWRT and https://github.com/msantos/evum for Linux VM in an Erlang process
 - check Ace in-browser editor http://ace.ajax.org/
+- check LevelDB as a simple k/v store
