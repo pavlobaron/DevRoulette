@@ -11,7 +11,7 @@ gen_server:call(dr_server, new_client).
 wx-client:
 menu File/Exit
 
-
+  
 TODO:
 
 - check OpenWRT and https://github.com/msantos/evum for Linux VM in an Erlang process
